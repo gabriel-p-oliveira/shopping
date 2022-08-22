@@ -12,6 +12,10 @@ function checkAndAplyPromotion(req, res, next) {
   try {
     const query = req.query;
     let product = filter(productList, "name", query);
+
+    if(!product[0]){
+      throw `product ${query.name} not available`
+    }
     if (!product[0]?.promotion) {
       next();
       //call nopromotion 

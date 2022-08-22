@@ -11,7 +11,7 @@ function noPromotion(req, res, next){
         query.earlyDate = formatDate(current.setDate(current.getDate() + product[0].earlyDate))
         query.promotion = 'no promotion available'
         if(!product){
-            throw 'product not found.'
+            throw `product "${req.query.name}" not found.`
         }
 
     } catch (error) {

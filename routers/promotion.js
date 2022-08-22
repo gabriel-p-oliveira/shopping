@@ -1,19 +1,12 @@
 const express = require('express')
 const router = express.Router()
+const promotionList = require('../promotion.json')
 
-require('dotenv').config()
 
-router.get('getAllPromotions',async (req, res) => {
+router.get('/getAllPromotions',async (req, res) => {
 
     try {
-        
-    } catch (error) {
-        
-    }
-})
-router.get('getPromotion',async (req, res) => {
-    try {
-        
+        res.send(promotionList)
     } catch (error) {
         
     }
@@ -21,4 +14,5 @@ router.get('getPromotion',async (req, res) => {
 
 
 
-module.exports = app => app.use('/auth', router)
+
+module.exports = app => app.use('/promotion', router)
