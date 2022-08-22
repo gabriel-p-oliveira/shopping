@@ -1,0 +1,30 @@
+[
+    {
+      "id": "b0212007-fc42-4d23-a91a-319489e0c4ac",
+      "name": "christmas",
+      "percentage": 20,
+      "rule": "date",
+      "ruleValue": "12-25-2022"
+    },
+    {
+      "id": "ff4e1820-a700-424a-8250-ace64f05eeb4",
+      "name": "last items",
+      "percentage": 30,
+      "rule": "product List",
+      "ruleValue": ["salt","shoes","wall"]
+    },
+    {
+      "id": "ae670cec-4d9d-49dd-8472-b552f2ffe73e",
+      "name": "Buy More",
+      "percentage": 20,
+      "rule": "more then",
+      "ruleValue": 20
+    },
+    {
+      "id": "bb167ce3-07b6-4aeb-b15b-93eb699faffa",
+      "name": "the seller got craizy",
+      "percentage": 90,
+      "rule": "more then & date",
+      "ruleValue": [100, "12-25-2022"]
+    }
+  ]
