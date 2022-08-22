@@ -9,7 +9,7 @@ function checkAmmount(req, res, next) {
   try {
     const { purchase } = req.body;
     if (purchase.length <= 0) {
-      throw "no product in purchase.";
+      throw {error:  "no product in purchase."}
     }
     let data = fs.readFileSync("product.json");
     let myprodList = JSON.parse(data);
@@ -20,7 +20,7 @@ function checkAmmount(req, res, next) {
       });
       if (filt[0]) {
         if (filt[0].quantity > myprodList[index].ammountAvailable) {
-          throw `Not enoght ammount Available for this quantity. only available ${myprodList[index].ammountAvailable} for the product ${myprodList[index].name}`;
+          throw {error:  `Not enoght ammount Available for this quantity. only available ${myprodList[index].ammountAvailable} for the product ${myprodList[index].name}`}
         }
         myprodList[index].ammountAvailable -= filt[0].quantity;
       }
@@ -45,7 +45,7 @@ function confirmPurchase(req, res, next) {
       let product = filter(productList, "name", {name: productBuyed.name});
 
       if (!product[0]) {
-        throw `product "${productBuyed.name}" not available`;
+        throw {error:  `product "${productBuyed.name}" not available`}
       }
       if (!product[0]?.promotion) {
         let current = new Date();
