@@ -15,7 +15,6 @@ function noPromotion(req, res, next){
 
         return res.send(query)
     } catch (error) {
-        console.log(error)
        return res.send(error)
     }
 }

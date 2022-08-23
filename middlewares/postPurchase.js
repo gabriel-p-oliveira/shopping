@@ -65,7 +65,6 @@ function confirmPurchase(req, res, next) {
         let promo = promotion.filter(function (element) {
           return element.id === product[0].promotionId;
         });
-
         if (promo[0].rule == "date") {
           finalPurchase.products.push(dateRule("a", promo[0], productBuyed, product[0], promo[0]));
         }
@@ -100,7 +99,7 @@ function confirmPurchase(req, res, next) {
 
     return res.send(finalPurchase)
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.send(error);
   }
 }

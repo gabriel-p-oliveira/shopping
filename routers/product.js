@@ -6,8 +6,7 @@ const purchase = require('../purchase.json')
 const {checkAndAplyPromotion} = require('../middlewares/checkAndAplyPromotion')
 const { noPromotion } = require('../middlewares/noPromotion')
 const {checkAmmount, confirmPurchase} = require('../middlewares/postPurchase')
-require('dotenv').config()
-
+const {checkProductAmount} = require('../middlewares/checkAmount')
 router.get('/getAllProducts', async (req, res) => {
 
     try {
@@ -16,7 +15,7 @@ router.get('/getAllProducts', async (req, res) => {
         
     }
 })
-router.get('/getProductByName',checkAndAplyPromotion, noPromotion)
+router.get('/getProductByName',checkProductAmount, checkAndAplyPromotion, noPromotion)
 
 
 router.get('/getAllPurchase',async (req, res) => {

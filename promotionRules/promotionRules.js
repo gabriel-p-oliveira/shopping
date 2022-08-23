@@ -7,9 +7,6 @@ const dateRule= (date, promo,  query,product) => {
     query.earlyDate = formatDate(current.setDate(current.getDate() + product.earlyDate))
     query.promoRule = promo.ruleValue
 
-    // console.log(current)
-    console.log(promo.ruleValue)
-    // console.log(current < promotionDate)
     if(current < promotionDate){
         const finalPrice = percentageFunc(query.quantity, product.price,  promo.percentage)
         query.finalPrice = finalPrice

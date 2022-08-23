@@ -12,19 +12,17 @@ function checkAndAplyPromotion(req, res, next) {
   try {
     const query = req.query;
     let product = filter(productList, "name", query);
-
     if(!product[0]){
       throw {error: `product ${query.name} not available`}
     }
     if (!product[0]?.promotion) {
       next();
-      //call nopromotion 
     } else {
       let promo = promotion.filter(function (element) {
         return element.id === product[0].promotionId;
       });
       
-
+      query.Price = product[0].price
       if (promo[0].rule == "date") {
         return res.send(dateRule("a", promo[0], query, product[0], promo[0]));
       }
@@ -39,7 +37,7 @@ function checkAndAplyPromotion(req, res, next) {
       }
     }
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     res.send(error)
   }
 }
