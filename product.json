@@ -21,8 +21,7 @@
   {
     "id": "aa070451-15e7-4bf6-9b28-29a77d48ee64",
     "name": "water",
-    "ammountAvailable": 2000
-    ,
+    "ammountAvailable": 2000,
     "price": 1,
     "promotion": false,
     "earlyDate": 2
@@ -30,8 +29,7 @@
   {
     "id": "aa070451-15e7-4bf6-9b28-29a77d48ee64",
     "name": "mouse",
-    "ammountAvailable": 2000
-    ,
+    "ammountAvailable": 2000 ,
     "price": 15,
     "promotion": false,
     "earlyDate": 2

@@ -1,5 +1,5 @@
-const {percentageFunc, formatDate, filter} = require('../utils')
-const dateRule= (date, promo,  query,product) => {
+const {percentageFunc, formatDate} = require('../utils')
+const dateRule= (promo,  query,product) => {
     let current = new Date();
     let promotionDate = new Date(promo.ruleValue)
     query.promotion = promo.name
