@@ -3,7 +3,9 @@ const productList = require('../product.json')
 function checkProductAmount(req, res, next){
     try {
         const query = req.query
-        
+        req.query.name = req.query.name.toLowerCase();
+        req.query.quantity = req.query.quantity.toLowerCase();
+
         const filt = productList.filter(function (purchasProd) {
             return purchasProd.name === query.name;
         });

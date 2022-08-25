@@ -9,6 +9,7 @@ function noPromotion(req, res, next){
         query.normalPrice =  query.quantity * product[0].price
         query.earlyDate = formatDate(current.setDate(current.getDate() + product[0].earlyDate))
         query.promotion = 'no promotion available'
+        query.price = product[0].price
         if(!product){
             throw {error:  `product "${req.query.name}" not found.`}
         }
