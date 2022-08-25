@@ -6,7 +6,7 @@ function noPromotion(req, res, next){
         const query = req.query;
         let current = new Date();
         let product = filter(productList,'name', req.query )
-        query.normalPrice =  query.quantity * product[0].price
+        query.normalprice =  query.quantity * product[0].price
         query.earlyDate = formatDate(current.setDate(current.getDate() + product[0].earlyDate))
         query.promotion = 'no promotion available'
         query.price = product[0].price

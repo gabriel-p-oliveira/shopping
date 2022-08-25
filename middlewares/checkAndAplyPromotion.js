@@ -8,10 +8,12 @@ const {
   productListPromo,
   moreThan
 } = require("../promotionRules/promotionRules");
+
 function checkAndAplyPromotion(req, res, next) {
   try {
     const query = req.query;
     let product = filter(productList, "name", query);
+    console.log(res.locals)
     if(!product[0]){
       throw {error: `product ${query.name} not available`}
     }
@@ -22,7 +24,7 @@ function checkAndAplyPromotion(req, res, next) {
         return element.id === product[0].promotionId;
       });
       
-      query.Price = product[0].price
+      query.price = product[0].price
       if (promo[0].rule == "date") {
         return res.send(dateRule("a", promo[0], query, product[0], promo[0]));
       }

@@ -40,7 +40,7 @@ function checkAmmount(req, res, next) {
 function confirmPurchase(req, res, next) {
   try {
     const { purchase } = req.body;
-    const finalPurchase = {products:[], totalPrice:0}
+    const finalPurchase = {products:[], totalprice:0}
     purchase.forEach((productBuyed, index) => {
       let product = filter(productList, "name", {name: productBuyed.name});
 
@@ -53,7 +53,7 @@ function confirmPurchase(req, res, next) {
         const prodNoPromotion = {
           id: product[0].id,
           name: productBuyed.name,
-          finalPrice:  productBuyed.quantity * product[0].price,
+          finalprice:  productBuyed.quantity * product[0].price,
           earlyDate: formatDate(current.setDate(current.getDate() + product[0].earlyDate)),
           quantity: productBuyed.quantity,
           promotion: 'no promotion available',
@@ -82,7 +82,7 @@ function confirmPurchase(req, res, next) {
       }
     });
     finalPurchase.products.map((prod) => {
-      finalPurchase.totalPrice += prod.finalPrice 
+      finalPurchase.totalprice += prod.finalprice 
     })
     finalPurchase.id = uuidv4()
 
