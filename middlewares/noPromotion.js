@@ -1,5 +1,5 @@
 const {formatDate} = require('../utils')
-const {insertInCacheAndReturnData} = require('../middlewares/redisCache')
+const {insertInCacheAndReturnData} = require('../redis')
 
 function noPromotion(req, res, next){
     try {

@@ -13,10 +13,10 @@ const { checkProductAmount } = require("../middlewares/checkAmount");
 const { getAll } = require("../elastic");
 const {
   returnCache,
-  insertInCacheAndReturnData,
 } = require("../middlewares/redisCache");
 
-router.get("/getAllProducts", async (req, res) => {
+const redisAll = require('../middlewares/redisAllCache')
+router.get("/getAllProducts", redisAll(180), async (req, res) => {
   try {
     const slow = req.query?.slow;
     const result = await getAll("product");
@@ -40,7 +40,7 @@ router.get(
   noPromotion
 );
 
-router.get("/getAllPurchase", async (req, res) => {
+router.get("/getAllPurchase", redisAll(180), async (req, res) => {
   try {
     const result = await getAll("purchase");
     res.send(result);
@@ -51,8 +51,7 @@ router.post(
   "/postPurchase",
   returnCache,
   checkAmmount,
-  confirmPurchase,
-  insertInCacheAndReturnData
+  confirmPurchase
 );
 
 module.exports = (app) => app.use("/product", router);

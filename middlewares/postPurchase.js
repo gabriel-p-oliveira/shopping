@@ -6,7 +6,6 @@ const {
   productListPromo,
 } = require("../promotionRules/promotionRules");
 
-const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const {
   getpromotion,
@@ -14,6 +13,7 @@ const {
   updateProductByName,
   insert,
 } = require("../elastic");
+const {insertInCacheAndReturnData} = require('../redis')
 
 async function checkAmmount(req, res, next) {
   try {
@@ -116,8 +116,9 @@ async function confirmPurchase(req, res, next) {
     finalPurchase.id = uuidv4();
 
     
+    console.log('finalPurchase')
     insert('purchase', finalPurchase)
-
+    insertInCacheAndReturnData(120, finalPurchase, req.originalUrl)
     return res.send(finalPurchase);
   } catch (error) {
     res.send(error);

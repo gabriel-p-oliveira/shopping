@@ -6,7 +6,7 @@ const {
 } = require("../promotionRules/promotionRules");
 
 const {getpromotion} = require('../elastic')
-const {insertInCacheAndReturnData} = require('../middlewares/redisCache')
+const {insertInCacheAndReturnData} = require('../redis')
 
 async function checkAndAplyPromotion(req, res, next) {
   try {
