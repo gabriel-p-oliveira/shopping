@@ -6,7 +6,9 @@ const {
   moreThan
 } = require("../promotionRules/promotionRules");
 
-function checkAndAplyPromotion(req, res, next) {
+const {getpromotion} = require('../elastic')
+
+async function checkAndAplyPromotion(req, res, next) {
   try {
     const query = req.query;
     let product = res.locals.product
@@ -17,22 +19,24 @@ function checkAndAplyPromotion(req, res, next) {
     if (!product?.promotion) {
       next();
     } else {
-      let promo = promotion.filter(function (element) {
-        return element.id === product.promotionId;
-      });
+      const p = await getpromotion('promotion', product.promotionId)
+
+      let promo = p.hits.hits[0]._source
       
       query.price = product.price
-      if (promo[0].rule == "date") {
-        return res.send(dateRule(promo[0], query, product, promo[0]));
+      const promos = ['date','more then & date','more then','product List']
+      
+      if (promo.rule == "date") {
+        return res.send(dateRule(promo, query, product, promo));
       }
-      if (promo[0].rule == "more then & date") {
-        return res.send(moreDate(promo[0], query, product, promo[0]));
+      if (promo.rule == "more then & date") {
+        return res.send(moreDate(promo, query, product, promo));
       }
-      if (promo[0].rule == "more then") {
-        return res.send(moreThan(promo[0], query, product, promo[0]));
+      if (promo.rule == "more then") {
+        return res.send(moreThan(promo, query, product, promo));
       }
-      if (promo[0].rule == "product List") {
-        return res.send(productListPromo(promo[0], query, product, promo[0]));
+      if (promo.rule == "product List") {
+        return res.send(productListPromo(promo, query, product, promo));
       }
     }
   } catch (error) {

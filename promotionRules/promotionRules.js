@@ -1,15 +1,17 @@
 const {percentageFunc, formatDate} = require('../utils')
+
+
 const dateRule= (promo,  query,product) => {
     let current = new Date();
-    let promotionDate = new Date(promo.ruleValue)
+    let promotionDate = new Date(promo.ruleValue[0])
     query.promotion = promo.name
     query.normalprice = query.quantity * product.price
     query.earlyDate = formatDate(current.setDate(current.getDate() + product.earlyDate))
     query.promoRule = promo.ruleValue
-
     if(current < promotionDate){
         const finalprice = percentageFunc(query.quantity, product.price,  promo.percentage)
-        query.finalprice = finalprice
+        query.finalprice = parseInt(finalprice.toFixed(2))
+
         query.percentage = promo.percentage
         query.promotionDetails = 'promotion valid.'
         return query
@@ -25,10 +27,9 @@ const moreDate= (promo,  query,product) => {
     query.normalprice = query.quantity * product.price
     query.earlyDate = formatDate(current.setDate(current.getDate() + product.earlyDate))
     query.promoRule = promo.ruleValue
-
     if(current < promotionDate && query.quantity >= promo.ruleValue[0]){
         const finalprice = percentageFunc(query.quantity, product.price,  promo.percentage)
-        query.finalprice = finalprice
+        query.finalprice = parseInt(finalprice.toFixed(2))
         query.percentage = promo.percentage
         query.promotionDetails = 'promotion valid.'
         return query        
@@ -47,7 +48,7 @@ const productListPromo = (promo,  query,product) => {
     let findProd = promo.ruleValue.filter(function(item) { return item === query.name; });
     if(findProd){
         const finalprice = percentageFunc(query.quantity, product.price,  promo.percentage)
-        query.finalprice = finalprice
+        query.finalprice = parseInt(finalprice.toFixed(2))
         query.percentage = promo.percentage
 
         query.promotionDetails = 'promotion valid.'
@@ -66,7 +67,7 @@ const moreThan = (promo,  query,product) => {
 
     if(query.quantity > promo.ruleValue){
         const finalprice = percentageFunc(query.quantity, product.price,  promo.percentage)
-        query.finalprice = finalprice
+        query.finalprice = parseInt(finalprice.toFixed(2))
         query.percentage = promo.percentage
         query.promotionDetails = 'promotion valid.'
         return query   

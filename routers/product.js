@@ -7,14 +7,26 @@ const {checkAndAplyPromotion} = require('../middlewares/checkAndAplyPromotion')
 const { noPromotion } = require('../middlewares/noPromotion')
 const {checkAmmount, confirmPurchase} = require('../middlewares/postPurchase')
 const {checkProductAmount} = require('../middlewares/checkAmount')
+const {getAll} = require('../elastic')
+
+
 router.get('/getAllProducts', async (req, res) => {
 
     try {
-        return res.send(productList)
-    } catch (error) {
-        
-    }
-})
+        const slow = req.query?.slow
+        const result= await getAll('product')
+          if(slow){
+            setTimeout(() => {
+              return res.send(result)
+            }, slow*1000)
+          }else{
+            return res.send(result)
+          }
+        } catch (error) {
+          return res.send(error)
+        }
+    });
+
 router.get('/getProductByName',checkProductAmount, checkAndAplyPromotion, noPromotion)
 
 

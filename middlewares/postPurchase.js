@@ -1,110 +1,130 @@
-const { filter, formatDate } = require("../utils");
-const {dateRule, moreDate,moreThan, productListPromo  } = require('../promotionRules/promotionRules')
-const productList = require("../product.json");
-const promotion = require("../promotion.json");
+const { formatDate } = require("../utils");
+const {
+  dateRule,
+  moreDate,
+  moreThan,
+  productListPromo,
+} = require("../promotionRules/promotionRules");
+
 const fs = require("fs");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
+const {
+  getpromotion,
+  getProduct,
+  updateProductByName,
+  insert,
+} = require("../elastic");
 
-function checkAmmount(req, res, next) {
+async function checkAmmount(req, res, next) {
   try {
-    const { purchase } = req.body;
+    const { purchase, slow } = req.body;
     if (purchase.length <= 0) {
-      throw {error:  "no product in purchase."}
+      throw { error: "no product in purchase." };
     }
-    let data = fs.readFileSync("product.json");
-    let myprodList = JSON.parse(data);
+    // console.log(await getAll('product'))
 
-    myprodList.forEach((prod, index) => {
-      const filt = purchase.filter(function (purchasProd) {
-        return purchasProd.name === prod.name;
-      });
-      if (filt[0]) {
-        if (filt[0].quantity > myprodList[index].ammountAvailable) {
-          throw {error:  `Not enoght ammount Available for this quantity. only available ${myprodList[index].ammountAvailable} for the product ${myprodList[index].name}`}
+    purchase.forEach(async (prod, index) => {
+      const p = await getProduct("product", prod.name);
+      const filt = p.hits.hits[0];
+      if (!filt) {
+        throw { error: `product "${prod.name}" not available` };
+      }
+
+      if (filt._source) {
+        if (filt._source.ammountAvailable < prod.quantity) {
+          throw {
+            error: `Not enoght ammount Available for this quantity. only available ${filt._source.ammountAvailable} for the product ${filt._source.name}`,
+          };
         }
-        myprodList[index].ammountAvailable -= filt[0].quantity;
+
+        filt._source.ammountAvailable -= prod.quantity;
+        updateProductByName(filt._id, filt._source.ammountAvailable);
       }
     });
-
-    let newData = JSON.stringify(myprodList);
-    fs.writeFile("product.json", newData, (err) => {
-      if (err) throw err;
-      res.send(error)
-    });
-    next();
+    if (slow) {
+      setTimeout(() => {
+        next();
+      }, slow * 1000);
+    } else {
+      next();
+    }
   } catch (error) {
-    res.send(error)
+    return res.send(error);
   }
 }
 
-function confirmPurchase(req, res, next) {
+async function confirmPurchase(req, res, next) {
   try {
+    // res.send(res.locals.prodList)
     const { purchase } = req.body;
-    const finalPurchase = {products:[], totalprice:0}
-    purchase.forEach((productBuyed, index) => {
-      let product = filter(productList, "name", {name: productBuyed.name});
+    const finalPurchase = { products: [], totalprice: 0 };
+    const productList = []
 
-      if (!product[0]) {
-        throw {error:  `product "${productBuyed.name}" not available`}
+    for(let i = 0; i < purchase.length +1; i++) {
+
+      if(i == purchase.length ){
+        finalPurchase.products = productList
+        break
       }
-      if (!product[0]?.promotion) {
+      let p = await getProduct("product", purchase[i].name);
+      if (!p.hits.hits[0]) {
+        return res.send({ error: `product "${purchase[i].name}" not available` });
+      }
+      let product = p.hits.hits[0]._source;
+      
+      if (!product?.promotion) {
         let current = new Date();
-
+        
         const prodNoPromotion = {
-          id: product[0].id,
-          name: productBuyed.name,
-          finalprice:  productBuyed.quantity * product[0].price,
-          earlyDate: formatDate(current.setDate(current.getDate() + product[0].earlyDate)),
-          quantity: productBuyed.quantity,
-          promotion: 'no promotion available',
-
-        }
-        finalPurchase.products.push(prodNoPromotion)
+          id: product.id,
+          name: purchase[i].name,
+          finalprice: purchase[i].quantity * product.price,
+          earlyDate: formatDate(
+            current.setDate(current.getDate() + product.earlyDate)
+          ),
+          quantity: purchase[i].quantity,
+          promotion: "no promotion available",
+        };
+        // productList.push(prodNoPromotion);
+        productList.push(prodNoPromotion)
       } else {
-        console.log('else')
-        let promo = promotion.filter(function (element) {
-          return element.id === product[0].promotionId;
-        });
-        if (promo[0].rule == "date") {
-          finalPurchase.products.push(dateRule("a", promo[0], productBuyed, product[0], promo[0]));
+        let p = await getpromotion("promotion", product.promotionId);
+
+        const promo = p.hits.hits[0]._source;
+
+        if (promo.rule == "date") {
+          productList.push(dateRule(promo, purchase[i], product, promo))
         }
-        if (promo[0].rule == "more then & date") {
-          finalPurchase.products.push(moreDate(promo[0], productBuyed, product[0], promo[0]));
+        if (promo.rule == "more then & date") {
+           productList.push( moreDate(promo, purchase[i], product, promo))
         }
-        if (promo[0].rule == "more then") {
-          finalPurchase.products.push(moreThan(promo[0], productBuyed, product[0], promo[0]));
+        if (promo.rule == "more then") {
+            productList.push(moreThan(promo, purchase[i], product, promo))
         }
-        if (promo[0].rule == "product List") {
-          finalPurchase.products.push(
-            productListPromo(promo[0], productBuyed, product[0], promo[0])
-          );
+        if (promo.rule == "product List") {
+          
+            productList.push(productListPromo(promo, purchase[i], product, promo))
+          
         }
       }
-    });
-    finalPurchase.products.map((prod) => {
-      finalPurchase.totalprice += prod.finalprice 
-    })
-    finalPurchase.id = uuidv4()
 
+    };
+
+    finalPurchase.products.forEach(async (prod) => {
+       finalPurchase.totalprice += prod.finalprice? prod.finalprice: prod.normalprice;
+    });
+    finalPurchase.id = uuidv4();
 
     
-    let purchaseList = fs.readFileSync("purchase.json");
-    let purchaseListObject = JSON.parse(purchaseList);
-    purchaseListObject.push(finalPurchase)
+    insert('purchase', finalPurchase)
 
-    let newData = JSON.stringify(purchaseListObject);
-    fs.writeFile("purchase.json", newData, (err) => {
-      if (err) throw err;
-    });
-
-    return res.send(finalPurchase)
+    return res.send(finalPurchase);
   } catch (error) {
-    // console.log(error);
     res.send(error);
   }
 }
 
 module.exports = {
   checkAmmount,
-  confirmPurchase
+  confirmPurchase,
 };
