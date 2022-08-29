@@ -1,4 +1,5 @@
 const {formatDate} = require('../utils')
+const {insertInCacheAndReturnData} = require('../middlewares/redisCache')
 
 function noPromotion(req, res, next){
     try {
@@ -16,11 +17,14 @@ function noPromotion(req, res, next){
         query.promotion = 'no promotion available'
         query.price = product.price
 
+        res.locals.product.query
         if(slow){
             setTimeout(() => {
+                insertInCacheAndReturnData(60, query, req.originalUrl)
                 return res.send(query)
             }, slow*1000)
           }else{
+                insertInCacheAndReturnData(60, query, req.originalUrl)
               return res.send(query)
           }
     } catch (error) {

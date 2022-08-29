@@ -1,4 +1,3 @@
-const promotion = require("../promotion.json");
 const {
   dateRule,
   moreDate,
@@ -7,6 +6,7 @@ const {
 } = require("../promotionRules/promotionRules");
 
 const {getpromotion} = require('../elastic')
+const {insertInCacheAndReturnData} = require('../middlewares/redisCache')
 
 async function checkAndAplyPromotion(req, res, next) {
   try {
@@ -25,22 +25,26 @@ async function checkAndAplyPromotion(req, res, next) {
       
       query.price = product.price
       const promos = ['date','more then & date','more then','product List']
-      
+      console.log('...')
       if (promo.rule == "date") {
+        insertInCacheAndReturnData(60, dateRule(promo, query, product, promo), req.originalUrl)
         return res.send(dateRule(promo, query, product, promo));
       }
       if (promo.rule == "more then & date") {
+        insertInCacheAndReturnData(60, moreDate(promo, query, product, promo), req.originalUrl);
         return res.send(moreDate(promo, query, product, promo));
       }
       if (promo.rule == "more then") {
+        insertInCacheAndReturnData(60, moreThan(promo, query, product, promo), req.originalUrl);
         return res.send(moreThan(promo, query, product, promo));
       }
       if (promo.rule == "product List") {
+        insertInCacheAndReturnData(60, productListPromo(promo, query, product, promo), req.originalUrl);
         return res.send(productListPromo(promo, query, product, promo));
       }
     }
   } catch (error) {
-    // console.log(error)
+    console.log(error)
     res.send(error)
   }
 }
