@@ -1,6 +1,18 @@
 const Redis = require('redis')
-const redisClient = Redis.createClient()
+// const redisClient = Redis.createClient() //local
+
+const redisClient = Redis.createClient({
+    socket: {
+        host: '10.229.240.73',
+        port: '6379'
+    }
+    //remove the object to run localy
+
+});
+
 redisClient.connect()
+
+
 
 async function insertInCacheAndReturnData (expiration, data, key) {
     try {

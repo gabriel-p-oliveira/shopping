@@ -4,16 +4,13 @@ const {getProduct} = require('../elastic')
 async function checkProductAmount(req, res, next) {
   try {
     const query = req.query;
-    const slow = req.query.slow;
     req.query.name = req.query.name.toLowerCase();
     req.query.quantity = req.query.quantity.toLowerCase();
 
     
     const p = await getProduct("product", req.query.name);
     const filt = p.hits.hits;
-    // const filt = productList.filter(function (purchasProd) {
-    //     return purchasProd.name === query.name;
-    // });
+
     if (!filt[0]) {
       throw { error: `Error, product ${query.name} not find.` };
     }
@@ -23,13 +20,8 @@ async function checkProductAmount(req, res, next) {
       };
     }
     res.locals.product = filt[0]._source;
-    if (slow) {
-      setTimeout(() => {
-        next();
-      }, slow * 1000);
-    } else {
-      next();
-    }
+    next();
+    
   } catch (error) {
     console.log('error');
     return res.send(error);

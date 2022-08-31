@@ -17,7 +17,7 @@ const {insertInCacheAndReturnData} = require('../redis')
 
 async function checkAmmount(req, res, next) {
   try {
-    const { purchase, slow } = req.body;
+    const { purchase } = req.body;
     if (purchase.length <= 0) {
       throw { error: "no product in purchase." };
     }
@@ -41,13 +41,8 @@ async function checkAmmount(req, res, next) {
         updateProductByName(filt._id, filt._source.ammountAvailable);
       }
     });
-    if (slow) {
-      setTimeout(() => {
-        next();
-      }, slow * 1000);
-    } else {
-      next();
-    }
+
+    next();
   } catch (error) {
     return res.send(error);
   }
@@ -116,7 +111,6 @@ async function confirmPurchase(req, res, next) {
     finalPurchase.id = uuidv4();
 
     
-    console.log('finalPurchase')
     insert('purchase', finalPurchase)
     insertInCacheAndReturnData(120, finalPurchase, req.originalUrl)
     return res.send(finalPurchase);

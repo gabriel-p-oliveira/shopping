@@ -24,23 +24,22 @@ async function checkAndAplyPromotion(req, res, next) {
       let promo = p.hits.hits[0]._source
       
       query.price = product.price
-      const promos = ['date','more then & date','more then','product List']
-      console.log('...')
+
       if (promo.rule == "date") {
-        insertInCacheAndReturnData(60, dateRule(promo, query, product, promo), req.originalUrl)
-        return res.send(dateRule(promo, query, product, promo));
+        insertInCacheAndReturnData(60, dateRule(promo, query, product), req.originalUrl)
+        return res.send(dateRule(promo, query, product));
       }
       if (promo.rule == "more then & date") {
-        insertInCacheAndReturnData(60, moreDate(promo, query, product, promo), req.originalUrl);
-        return res.send(moreDate(promo, query, product, promo));
+        insertInCacheAndReturnData(60, moreDate(promo, query, product), req.originalUrl);
+        return res.send(moreDate(promo, query, product));
       }
       if (promo.rule == "more then") {
-        insertInCacheAndReturnData(60, moreThan(promo, query, product, promo), req.originalUrl);
-        return res.send(moreThan(promo, query, product, promo));
+        insertInCacheAndReturnData(60, moreThan(promo, query, product), req.originalUrl);
+        return res.send(moreThan(promo, query, product));
       }
       if (promo.rule == "product List") {
-        insertInCacheAndReturnData(60, productListPromo(promo, query, product, promo), req.originalUrl);
-        return res.send(productListPromo(promo, query, product, promo));
+        insertInCacheAndReturnData(60, productListPromo(promo, query, product), req.originalUrl);
+        return res.send(productListPromo(promo, query, product));
       }
     }
   } catch (error) {

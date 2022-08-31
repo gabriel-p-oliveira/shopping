@@ -1,15 +1,15 @@
 const {formatDate} = require('../utils')
 const {insertInCacheAndReturnData} = require('../redis')
 
-function noPromotion(req, res, next){
+async function noPromotion(req, res, next){
     try {
         const query = req.query;
-        const slow = req.query.slow;
 
         let current = new Date();
-        let product = res.locals.product._source
+        let product = res.locals.product
+
         if(!product){
-            throw {error:  `product "${req.query.name}" not found.`}
+            throw {error:  `product "${query.name}" not found.`}
         }
         query.normalprice =  query.quantity * product.price
         query.finalprice =  query.quantity * product.price
@@ -18,15 +18,9 @@ function noPromotion(req, res, next){
         query.price = product.price
 
         res.locals.product.query
-        if(slow){
-            setTimeout(() => {
-                insertInCacheAndReturnData(60, query, req.originalUrl)
-                return res.send(query)
-            }, slow*1000)
-          }else{
-                insertInCacheAndReturnData(60, query, req.originalUrl)
-              return res.send(query)
-          }
+
+        insertInCacheAndReturnData(60, query, req.originalUrl)  
+        return res.send(query)
     } catch (error) {
        return res.send(error)
     }
