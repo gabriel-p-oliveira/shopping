@@ -65,7 +65,8 @@ const moreThan = (promo,  query,product) => {
     query.earlyDate = formatDate(current.setDate(current.getDate() + product.earlyDate))
     query.promoRule = promo.ruleValue
 
-    if(query.quantity > promo.ruleValue){
+    
+    if(query.quantity >= parseInt(promo.ruleValue[0])){
         const finalprice = percentageFunc(query.quantity, product.price,  promo.percentage)
         query.finalprice = parseInt(finalprice.toFixed(2))
         query.percentage = promo.percentage
